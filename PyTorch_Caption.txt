@@ -1,0 +1,4 @@
+import warnings,logging
+warnings.simplefilter('ignore')
+logging.disable(logging.WARNING)
+
