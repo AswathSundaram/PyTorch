@@ -52,26 +52,18 @@ imshow(torchvision.utils.make_grid(images))
 
 class ConvNet(nn.Module):
     def __init__(self):
-        super(ConvNet, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 10)
-
+        super(ConvNet, self,inp:int,hidden:int,out:int).__init__()
+        self.conv1 = nn.Sequential(nn.Conv2d(inp,hidden,kernel_size=5,stride=1),nn.ReLU,nn.Conv2d(hidden,hidden,kernel_size=5,stride=1),nn.MaxPool2d(2, 2))
+        self.conv2 = nn.Sequential(nn.Conv2d(hidden,hidden,kernel_size=5,stride=1),nn.ReLU,nn.Conv2d(hidden,hidden,kernel_size=5,stride=1),nn.MaxPool2d(2))
+        self.fc1 = (nn.Flatten(),nn.Linear(16 * 5 * 5, out)) #Flatten coverts into 1 dim
     def forward(self, x):
         # -> n, 3, 32, 32
-        x = self.pool(F.relu(self.conv1(x)))  # -> n, 6, 14, 14
-        x = self.pool(F.relu(self.conv2(x)))  # -> n, 16, 5, 5
-        x = x.view(-1, 16 * 5 * 5)            # -> n, 400
-        x = F.relu(self.fc1(x))               # -> n, 120
-        x = F.relu(self.fc2(x))               # -> n, 84
-        x = self.fc3(x)                       # -> n, 10
+        x=self.conv1(x) 
+        x=self.conv2(x)
+        x=self.fc1(x)
         return x
 
-
-model = ConvNet().to(device)
+model = ConvNet(inp=3,hidden=10,out=6).to(device)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
